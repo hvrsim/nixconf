@@ -1,58 +1,151 @@
 {
+  nixconf,
   pkgs,
   lib,
-  username,
+  config,
   ...
-}: {
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.${username} = {
-    isNormalUser = true;
-    description = username;
-    extraGroups = [ "networkmanager" "wheel" "kvm" ];
+}:
+
+let
+  inherit (lib.types) str;
+  inherit (config.boot) isContainer;
+
+  inherit (lib)
+    mkOption
+    mkEnableOption
+    mkDefault
+    mkIf
+    singleton
+    ;
+
+  inherit (cfg)
+    username
+    iHaveLotsOfRam
+    ;
+
+  cfg = config.modules.system;
+in
+{
+  imports = with nixconf.inputs.home-manager.nixosModules; [ home-manager ];
+
+  options.modules.system = {
+    username = mkOption {
+      type = str;
+      default = "yusuf";
+    };
+
+    timeZone = mkOption {
+      type = str;
+      default = "America/Chicago";
+    };
+
+    defaultLocale = mkOption {
+      type = str;
+      default = "en_US.UTF-8";
+    };
+
+    stateVersion = mkOption {
+      type = str;
+      default = "24.11";
+    };
+
+    hostName = mkOption {
+      type = str;
+      default = "nixos";
+    };
+
+    iHaveLotsOfRam = mkEnableOption "tmpfs on /tmp";
   };
 
-  # Give the users in this list the right to specify additional substituters via:
-  #    1. `nixConfig.substituers` in `flake.nix`
-  #    2. command line args `--options substituers http://xxx`
-  nix.settings.trusted-users = [username];
+  config = {
+    boot = {
+      tmp = if iHaveLotsOfRam then { useTmpfs = true; } else { cleanOnBoot = true; };
 
-  # Enable new nix cmdline syntax and flakes.
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+      loader = {
+        systemd-boot = mkIf (pkgs.system != "aarch64-linux") {
+          enable = true;
+          configurationLimit = 10;
+        };
 
-  # Do garbage collection weekly to keep disk usage low.
-  nix.gc = {
-    automatic = lib.mkDefault true;
-    dates = lib.mkDefault "weekly";
-    options = lib.mkDefault "--delete-older-than 7d";
+        efi.canTouchEfiVariables = true;
+      };
+    };
+
+    nix = {
+      package = pkgs.nixVersions.latest;
+
+      gc = {
+        automatic = mkDefault true;
+        dates = mkDefault "weekly";
+        options = mkDefault "--delete-older-than 7d";
+      };
+
+      settings = {
+        auto-optimise-store = true;
+        warn-dirty = false;
+
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
+
+        trusted-users = [
+          "root"
+          "@wheel"
+        ];
+      };
+    };
+
+    zramSwap.enable = true;
+
+    time = {
+      inherit (cfg) timeZone;
+    };
+
+    i18n = {
+      inherit (cfg) defaultLocale;
+    };
+
+    system = {
+      inherit (cfg) stateVersion;
+    };
+
+    users.users.${username} = {
+      isNormalUser = true;
+      description = username;
+      uid = 1000;
+
+      extraGroups = [ "networkmanager" "wheel" "kvm" "video" "input" ];
+    };
+
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+
+      sharedModules = singleton {
+        home = {
+          inherit (cfg) stateVersion;
+        };
+
+        programs.man.generateCaches = true;
+      };
+
+      users.${username}.home = {
+        inherit username;
+
+        homeDirectory = "/home/${username}";
+      };
+    };
+
+    networking = {
+      inherit (cfg) hostName;
+
+      networkmanager.enable = true;
+    };
+
+    environment = {
+      defaultPackages = [ ];
+      gnome.excludePackages = with pkgs; [ gnome-tour ];
+    };
   };
-
-  # Allow unfree packages.
-  nixpkgs.config.allowUnfree = true;
-
-  # Set the time zone.
-  time.timeZone = "America/Chicago";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search <pkgname>
-  environment.systemPackages = with pkgs; [
-    curl
-    git
-    file
-    tree
-    neofetch
-  ];
 }

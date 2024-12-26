@@ -15,34 +15,28 @@
     };
   };
 
-  outputs = inputs @ {
-    self,
-    nixpkgs,
-    home-manager,
-    ...
-  }: {
+  outputs = { self, nixpkgs, ... }:
+  let
+    inherit (nixpkgs.lib) nixosSystem genAttrs replaceStrings;
+    inherit (nixpkgs.lib.filesystem) listFilesRecursive;
+
+    nameOf = path: replaceStrings [ ".nix" ] [ "" ] (baseNameOf (toString path));
+  in
+  {
+    nixosModules = genAttrs (map nameOf (listFilesRecursive ./modules)) (
+      name: import ./modules/${name}.nix
+    );
+
+    homeModules = genAttrs (map nameOf (listFilesRecursive ./home)) (name: import ./home/${name}.nix);
+
     nixosConfigurations = {
-      functional = let
-        username = "yusuf";
-        specialArgs = {inherit username;};
-      in
-        nixpkgs.lib.nixosSystem {
-          inherit specialArgs;
-          system = "x86_64-linux";
-
-          modules = [
-            ./hosts/functional
-
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-
-              home-manager.extraSpecialArgs = inputs // specialArgs;
-              home-manager.users.${username} = import ./users/${username}/home.nix;
-            }
-          ];
-        };
+      thinkpad = nixosSystem {
+        system = "x86_64-linux";
+        specialArgs.nixconf = self;
+        modules = listFilesRecursive ./hosts/thinkpad;
+      };
     };
+
+    formatter = nixpkgs.nixfmt-style-rfc;
   };
 }
