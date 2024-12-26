@@ -1,27 +1,44 @@
-{ config, lib, pkgs, modulesPath, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  modulesPath,
+  ...
+}:
 
 {
-  imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
-    ];
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+  ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "ehci_pci"
+    "ahci"
+    "usb_storage"
+    "sd_mod"
+    "rtsx_pci_sdmmc"
+  ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/6f712f6b-98de-49ce-9bd2-f0687d26d4ea";
-      fsType = "xfs";
-    };
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/6f712f6b-98de-49ce-9bd2-f0687d26d4ea";
+    fsType = "xfs";
+  };
 
-  boot.initrd.luks.devices."luks-6208d93d-dba0-478d-bc66-f681ae157262".device = "/dev/disk/by-uuid/6208d93d-dba0-478d-bc66-f681ae157262";
+  boot.initrd.luks.devices."luks-6208d93d-dba0-478d-bc66-f681ae157262".device =
+    "/dev/disk/by-uuid/6208d93d-dba0-478d-bc66-f681ae157262";
 
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/9C38-7BF9";
-      fsType = "vfat";
-      options = [ "fmask=0077" "dmask=0077" ];
-    };
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/9C38-7BF9";
+    fsType = "vfat";
+    options = [
+      "fmask=0077"
+      "dmask=0077"
+    ];
+  };
 
   swapDevices = [ ];
 

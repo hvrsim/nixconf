@@ -115,7 +115,13 @@ in
       description = username;
       uid = 1000;
 
-      extraGroups = [ "networkmanager" "wheel" "kvm" "video" "input" ];
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+        "kvm"
+        "video"
+        "input"
+      ];
     };
 
     home-manager = {
