@@ -66,11 +66,11 @@ in
 
           plymouth = {
             enable = true;
-            theme = "cuts";
+            theme = "blockchain";
             themePackages = with pkgs; [
               # By default we would install all themes
               (adi1090x-plymouth-themes.override {
-                selected_themes = [ "cuts" ];
+                selected_themes = [ "blockchain" ];
               })
             ];
           };
