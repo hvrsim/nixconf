@@ -18,15 +18,11 @@
             "expr" = "import <nixpkgs> { }";
           };
           "formatting" = {
-            "command" = [ "nixfmt" ];
+            "command" = [ "nix" "fmt" ];
           };
           "options" = {
             "nixos" = {
               "expr" = "(builtins.getFlake \"/home/yusuf/Code/nixconf\").nixosConfigurations.thinkpad.options";
-            };
-            "home-manager" = {
-              "expr" =
-                "(builtins.getFlake \"/home/yusuf/Code/nixconf\").homeConfigurations.\"yusuf@functional\".options";
             };
           };
         };

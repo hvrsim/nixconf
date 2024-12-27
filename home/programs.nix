@@ -3,6 +3,7 @@
 {
   programs.bat.enable = true;
   programs.ripgrep.enable = true;
+  programs.command-not-found.enable = false;
 
   home.packages = [
     pkgs.microfetch
