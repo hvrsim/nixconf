@@ -8,7 +8,6 @@
 
 let
   inherit (lib.types) str;
-  inherit (config.boot) isContainer;
 
   inherit (lib)
     mkOption
@@ -21,6 +20,7 @@ let
   inherit (cfg)
     username
     iHaveLotsOfRam
+    plymouth
     ;
 
   cfg = config.modules.system;
@@ -55,21 +55,63 @@ in
     };
 
     iHaveLotsOfRam = mkEnableOption "tmpfs on /tmp";
+    plymouth = mkEnableOption "plymouth boot animations";
   };
 
   config = {
-    boot = {
-      tmp = if iHaveLotsOfRam then { useTmpfs = true; } else { cleanOnBoot = true; };
+    boot =
+      if plymouth then
+        {
+          tmp = if iHaveLotsOfRam then { useTmpfs = true; } else { cleanOnBoot = true; };
 
-      loader = {
-        systemd-boot = mkIf (pkgs.system != "aarch64-linux") {
-          enable = true;
-          configurationLimit = 10;
+          plymouth = {
+            enable = true;
+            theme = "cuts";
+            themePackages = with pkgs; [
+              # By default we would install all themes
+              (adi1090x-plymouth-themes.override {
+                selected_themes = [ "cuts" ];
+              })
+            ];
+          };
+
+          loader = {
+            systemd-boot = mkIf (pkgs.system != "aarch64-linux") {
+              enable = true;
+              configurationLimit = 10;
+            };
+
+            efi.canTouchEfiVariables = true;
+            timeout = 0;
+          };
+
+          # Enable "Silent Boot"
+          consoleLogLevel = 0;
+          initrd.verbose = false;
+          kernelParams = [
+            "quiet"
+            "splash"
+            "boot.shell_on_fail"
+            "loglevel=3"
+            "rd.systemd.show_status=false"
+            "rd.udev.log_level=3"
+            "udev.log_priority=3"
+          ];
+        }
+      else
+        {
+          tmp = if iHaveLotsOfRam then { useTmpfs = true; } else { cleanOnBoot = true; };
+
+          loader = {
+            systemd-boot = mkIf (pkgs.system != "aarch64-linux") {
+              enable = true;
+              configurationLimit = 10;
+            };
+
+            efi.canTouchEfiVariables = true;
+            timeout = 0;
+          };
         };
-
-        efi.canTouchEfiVariables = true;
-      };
-    };
 
     nix = {
       package = pkgs.nixVersions.latest;
@@ -147,11 +189,6 @@ in
       inherit (cfg) hostName;
 
       networkmanager.enable = true;
-    };
-
-    environment = {
-      defaultPackages = [ ];
-      gnome.excludePackages = with pkgs; [ gnome-tour ];
     };
   };
 }

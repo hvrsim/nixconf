@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ nixconf, pkgs, ... }:
 
 {
   users.defaultUserShell = pkgs.fish;
@@ -9,7 +9,6 @@
     ];
 
     systemPackages = with pkgs; [
-      microfetch
       neofetch
       curl
       git
@@ -26,4 +25,6 @@
       silent = true;
     };
   };
+
+  nix.nixPath = [ "nixpkgs=${nixconf.inputs.nixpkgs}" ];
 }

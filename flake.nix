@@ -4,14 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nixvim = {
-      url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -21,6 +17,15 @@
     let
       inherit (nixpkgs.lib) nixosSystem genAttrs replaceStrings;
       inherit (nixpkgs.lib.filesystem) listFilesRecursive;
+
+      forAllSystems =
+        function:
+
+        genAttrs [
+          "x86_64-linux"
+          "aarch64-linux"
+          "riscv64-linux"
+        ] (system: function nixpkgs.legacyPackages.${system});
 
       nameOf = path: replaceStrings [ ".nix" ] [ "" ] (baseNameOf (toString path));
     in
@@ -39,6 +44,6 @@
         };
       };
 
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
+      formatter = forAllSystems (pkgs: pkgs.nixfmt-rfc-style);
     };
 }

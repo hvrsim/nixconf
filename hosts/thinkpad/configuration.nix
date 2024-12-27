@@ -4,16 +4,26 @@ let
   inherit (builtins) attrValues;
 in
 {
-  imports = attrValues nixconf.nixosModules ++ [nixconf.inputs.nixos-hardware.nixosModules.lenovo-thinkpad-x250];
+  imports =
+    attrValues nixconf.nixosModules
+    ++ [ nixconf.inputs.nixos-hardware.nixosModules.lenovo-thinkpad-x250 ]
+    ++ [ nixconf.inputs.chaotic.nixosModules.default ];
   home-manager.sharedModules = attrValues nixconf.homeModules;
 
-  # enable microcode updates.
-  hardware.cpu.intel.updateMicrocode = true;
+  # use the CachyOS kernel.
+  boot.kernelPackages = pkgs.linuxPackages_cachyos;
 
   modules = {
-    hardware.bluetooth = true;
     gnome.enable = true;
 
-    system.hostName = "functional";
+    hardware = {
+      bluetooth = true;
+      microcode = true;
+    };
+
+    system = {
+      hostName = "functional";
+      plymouth = true;
+    };
   };
 }
