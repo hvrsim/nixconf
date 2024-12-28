@@ -8,7 +8,6 @@
   home.packages = [
     pkgs.microfetch
     pkgs.nixd
-    pkgs.rustup
   ];
 
   programs.git = {
