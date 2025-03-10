@@ -27,5 +27,7 @@ in
     hardware.bluetooth.enable = mkIf bluetooth true;
     hardware.cpu.intel.updateMicrocode = mkIf microcode true;
     hardware.cpu.amd.updateMicrocode = mkIf microcode true;
+
+    zramSwap.enable = true;
   };
 }

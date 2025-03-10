@@ -138,8 +138,6 @@ in
       };
     };
 
-    zramSwap.enable = true;
-
     time = {
       inherit (cfg) timeZone;
     };
