@@ -42,6 +42,11 @@
           specialArgs.nixconf = self;
           modules = listFilesRecursive ./hosts/thinkpad;
         };
+        toshiba = nixosSystem {
+          system = "x86_64-linux";
+          specialArgs.nixconf = self;
+          modules = listFilesRecursive ./hosts/toshiba;
+        };
       };
 
       formatter = forAllSystems (pkgs: pkgs.nixfmt-rfc-style);
