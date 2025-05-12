@@ -13,17 +13,13 @@ in
   # use the CachyOS kernel.
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
 
+  time.timeZone = "America/Chicago";
+  i18n.defaultLocale = "en_US.UTF-8";
+
   modules = {
     gnome.enable = true;
+    laptop.enable = true;
 
-    hardware = {
-      bluetooth = true;
-      microcode = true;
-    };
-
-    system = {
-      hostName = "functional";
-      plymouth = true;
-    };
+    system.hostName = "functional";
   };
 }

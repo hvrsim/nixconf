@@ -11,16 +11,12 @@ let
 
   inherit (lib)
     mkOption
-    mkEnableOption
     mkDefault
-    mkIf
     singleton
     ;
 
   inherit (cfg)
     username
-    iHaveLotsOfRam
-    plymouth
     ;
 
   cfg = config.modules.system;
@@ -32,87 +28,23 @@ in
     username = mkOption {
       type = str;
       default = "yusuf";
-    };
-
-    timeZone = mkOption {
-      type = str;
-      default = "America/Chicago";
-    };
-
-    defaultLocale = mkOption {
-      type = str;
-      default = "en_US.UTF-8";
+      description = "username for the main user";
     };
 
     stateVersion = mkOption {
       type = str;
       default = "24.11";
+      description = "state version from original nixos install";
     };
 
     hostName = mkOption {
       type = str;
       default = "nixos";
+      description = "system hostname";
     };
-
-    iHaveLotsOfRam = mkEnableOption "tmpfs on /tmp";
-    plymouth = mkEnableOption "plymouth boot animations";
   };
 
   config = {
-    boot =
-      if plymouth then
-        {
-          tmp = if iHaveLotsOfRam then { useTmpfs = true; } else { cleanOnBoot = true; };
-
-          plymouth = {
-            enable = true;
-            theme = "blockchain";
-            themePackages = with pkgs; [
-              # By default we would install all themes
-              (adi1090x-plymouth-themes.override {
-                selected_themes = [ "blockchain" ];
-              })
-            ];
-          };
-
-          loader = {
-            systemd-boot = mkIf (pkgs.system != "aarch64-linux") {
-              enable = true;
-              configurationLimit = 10;
-            };
-
-            efi.canTouchEfiVariables = true;
-            timeout = 0;
-          };
-
-          # Enable "Silent Boot"
-          consoleLogLevel = 0;
-          initrd.verbose = false;
-          kernelParams = [
-            "quiet"
-            "splash"
-            "boot.shell_on_fail"
-            "loglevel=3"
-            "rd.systemd.show_status=false"
-            "rd.udev.log_level=3"
-            "udev.log_priority=3"
-          ];
-        }
-      else
-        {
-          tmp = if iHaveLotsOfRam then { useTmpfs = true; } else { cleanOnBoot = true; };
-
-          loader = {
-            systemd-boot = mkIf (pkgs.system != "aarch64-linux") {
-              enable = true;
-              configurationLimit = 10;
-            };
-
-            efi.canTouchEfiVariables = true;
-            timeout = 0;
-          };
-        };
-
     nix = {
       package = pkgs.nixVersions.latest;
 
@@ -136,14 +68,6 @@ in
           "@wheel"
         ];
       };
-    };
-
-    time = {
-      inherit (cfg) timeZone;
-    };
-
-    i18n = {
-      inherit (cfg) defaultLocale;
     };
 
     system = {
@@ -188,5 +112,7 @@ in
 
       networkmanager.enable = true;
     };
+
+    documentation.nixos.includeAllModules = true;
   };
 }

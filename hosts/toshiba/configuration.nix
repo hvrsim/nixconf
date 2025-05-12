@@ -1,4 +1,4 @@
-{ nixconf, pkgs, ... }:
+{ nixconf, ... }:
 
 let
   inherit (builtins) attrValues;
@@ -7,18 +7,21 @@ in
   imports = attrValues nixconf.nixosModules;
   home-manager.sharedModules = attrValues nixconf.homeModules;
 
+  time.timeZone = "America/Chicago";
+  i18n.defaultLocale = "en_US.UTF-8";
+
   modules = {
     gnome.enable = true;
-
-    hardware = {
-      microcode = true;
+    laptop = {
+      enable = true;
+      bluetooth = false;
+      tmpfs = false;
     };
 
     system = {
       hostName = "starship";
       username = "blazt";
       stateVersion = "23.05";
-      plymouth = true;
     };
   };
 

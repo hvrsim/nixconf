@@ -9,6 +9,7 @@
     ];
 
     systemPackages = with pkgs; [
+      firefox
       neofetch
       curl
       git
