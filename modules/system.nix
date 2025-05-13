@@ -118,7 +118,7 @@ in
       ];
 
       systemPackages = with pkgs; [
-        firefox
+        nixconf.inputs.zen-browser.packages."${system}".twilight
         curl
         file
       ];
