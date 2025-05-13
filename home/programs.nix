@@ -7,7 +7,9 @@
 
   home.packages = [
     pkgs.microfetch
+    pkgs.neofetch
     pkgs.nixd
+    pkgs.tree
   ];
 
   programs.git = {

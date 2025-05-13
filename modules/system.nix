@@ -47,6 +47,7 @@ in
   config = {
     nix = {
       package = pkgs.nixVersions.latest;
+      nixPath = [ "nixpkgs=${nixconf.inputs.nixpkgs}" ];
 
       gc = {
         automatic = mkDefault true;
@@ -74,18 +75,22 @@ in
       inherit (cfg) stateVersion;
     };
 
-    users.users.${username} = {
-      isNormalUser = true;
-      description = username;
-      uid = 1000;
+    users = {
+      defaultUserShell = pkgs.fish;
 
-      extraGroups = [
-        "networkmanager"
-        "wheel"
-        "kvm"
-        "video"
-        "input"
-      ];
+      users.${username} = {
+        isNormalUser = true;
+        description = username;
+        uid = 1000;
+
+        extraGroups = [
+          "networkmanager"
+          "wheel"
+          "kvm"
+          "video"
+          "input"
+        ];
+      };
     };
 
     home-manager = {
@@ -105,6 +110,24 @@ in
 
         homeDirectory = "/home/${username}";
       };
+    };
+
+    environment = {
+      shells = with pkgs; [
+        fish
+      ];
+
+      systemPackages = with pkgs; [
+        firefox
+        curl
+        file
+      ];
+    };
+
+    programs = {
+      fish.enable = true;
+      direnv.enable = true;
+      direnv.silent = true;
     };
 
     networking = {
