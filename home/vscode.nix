@@ -3,7 +3,7 @@
 {
   programs.vscode = {
     enable = true;
-    package = pkgs.vscodium;
+    package = pkgs.cursor;
     mutableExtensionsDir = false;
 
     profiles.default = {

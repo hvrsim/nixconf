@@ -6,7 +6,6 @@
   programs.command-not-found.enable = false;
 
   home.packages = [
-    pkgs.microfetch
     pkgs.neofetch
     pkgs.nixd
     pkgs.tree

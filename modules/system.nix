@@ -137,5 +137,6 @@ in
     };
 
     documentation.nixos.includeAllModules = true;
+    nixpkgs.config.allowUnfree = true;
   };
 }
