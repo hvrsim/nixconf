@@ -1,0 +1,2 @@
+-- UWSM and Home Manager own session environment and startup services on NixOS.
+-- This intentionally replaces Omarchy's imperative provisioning autostart.

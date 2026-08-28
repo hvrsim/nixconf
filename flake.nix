@@ -28,9 +28,18 @@
       lanzaboote,
       ...
     }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in
     {
+      nixosModules = {
+        default = ./modules/omarchy.nix;
+        omarchy = ./modules/omarchy.nix;
+      };
+
       nixosConfigurations.inspiron = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        inherit system;
 
         modules = [
           ./hosts/inspiron
@@ -41,6 +50,8 @@
         ];
       };
 
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
+      packages.${system}.omarchy = pkgs.callPackage ./packages/omarchy { };
+
+      formatter.${system} = pkgs.nixfmt-tree;
     };
 }

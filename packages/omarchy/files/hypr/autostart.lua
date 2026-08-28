@@ -1,0 +1,3 @@
+-- Session daemons are declarative Home Manager services. Keeping this file
+-- intentionally empty prevents Arch provisioning commands from entering the
+-- session while retaining Omarchy's normal user override point.

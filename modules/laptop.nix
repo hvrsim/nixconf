@@ -17,7 +17,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
   boot.tmp.useTmpfs = true;
-  
+
   networking.networkmanager.enable = true;
   powerManagement.enable = true;
 

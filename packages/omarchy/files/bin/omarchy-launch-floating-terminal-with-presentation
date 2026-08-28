@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Compatibility entry point for the network panel's interactive DNS prompt.
+command=${1:?Usage: omarchy-launch-floating-terminal-with-presentation command}
+exec uwsm-app -- foot --app-id=org.omarchy.terminal --title=Omarchy -e bash -lc "$command"

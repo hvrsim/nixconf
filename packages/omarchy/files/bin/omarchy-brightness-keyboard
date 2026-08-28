@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+shopt -s nullglob
+
+devices=(/sys/class/leds/*kbd_backlight*)
+(( ${#devices[@]} > 0 )) || exit 0
+device=${devices[0]##*/}
+
+case "${1:-}" in
+  off) exec brightnessctl -sd "$device" set 0 ;;
+  restore) exec brightnessctl -rd "$device" ;;
+  *)
+    echo "Usage: omarchy-brightness-keyboard <off|restore>" >&2
+    exit 2
+    ;;
+esac
