@@ -48,5 +48,6 @@
     git
     curl
     vim
+    codex
   ];
 }
